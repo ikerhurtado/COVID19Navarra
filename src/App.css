@@ -1,0 +1,12 @@
+
+.App {
+    margin: 0 6%;
+}
+
+
+@media only screen and (min-width: 880px) {
+.App {
+    margin: 0 auto;
+    width: 900px;
+}
+}

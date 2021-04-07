@@ -1,0 +1,33 @@
+
+:root {
+    --fz: 16px;
+    --theme-body-bg: white;
+    --theme-body-txt: rgb(126, 9, 9);
+    
+  }
+  
+  html {
+    box-sizing: border-box;
+    font-size: 1rem;
+  }
+  
+  *,
+  *:before,
+  *:after {
+    box-sizing: inherit;
+  }
+  
+  body {
+    margin: 0;
+    font-family: 'Robot', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: var(--fz);
+    background-color: var(--theme-body-bg);
+    color: var(--theme-body-txt);
+  }
+
+  a{
+    color: inherit;
+    text-decoration: none;
+  }

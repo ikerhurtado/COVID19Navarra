@@ -1,0 +1,15 @@
+.Menu{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.Menu a{
+    padding: 4px 20px;
+    
+}
+
+.Menu a.selected{
+    font-weight: bold;
+}
