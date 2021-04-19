@@ -1,15 +1,13 @@
-import React, {useState, useEffect, useRef} from 'react'
-import Chart from 'chart.js'
 
-export default function VaccinationChart({data}){
+import React, {useState, useEffect, useRef} from 'react'
+
+export default function HospitalizationDeadsChart({data}){
 
     const [showingAccumulated, setShowingAccumulated] = useState(false)
     const canvasRef = useRef(null)
     const canvasRefAccumulated = useRef(null)
 
     useEffect( () => {
-        console.log('VaccinationChart useEffect', showingAccumulated)
-        
 
         if (showingAccumulated){
             const chartAccumulated = new Chart(canvasRefAccumulated.current, {
@@ -19,45 +17,56 @@ export default function VaccinationChart({data}){
             chartAccumulated.data.labels = data.labels
             chartAccumulated.data.datasets = [
                 {
-                    label: 'Acumulado vacunas administradas',  
-                    backgroundColor: '#7B1287',
+                    label: 'Acumulado muertes',  
+                    backgroundColor: 'black',
                     data: data.datasets[1]
                 },
                 {
-                    label: 'Acumulado vacunación completa',  
-                    backgroundColor: '#5C0A66',
+                    label: 'Acumulado hospitalizaciones',  
+                    backgroundColor: 'grey',
                     data: data.datasets[3]
                 },
+                { 
+                    label: 'Acumulado entradas en UCIs', 
+                    backgroundColor: 'red', 
+                    data: data.datasets[5]
+                }
             ]
             chartAccumulated.update()
-        }else{
+
+        }else {
             const chart = new Chart(canvasRef.current, {
-                type: "bar", 
-                options: {responsive: true } 
+                type: "bar",
+                options: { responsive: true }
             })
+    
             chart.data.labels = data.labels
+    
             chart.data.datasets = [
-                {
-                    label: 'Vacunas administradas', 
-                    backgroundColor: '#DB72E7',
+                { 
+                    label: 'Muertes', 
+                    backgroundColor: 'black', 
                     data: data.datasets[0]
                 },
-                {
-                    label: 'Vacunación completa',  
-                    backgroundColor: '#BB52C7',
+                { 
+                    label: 'Nuevas hospitalizaciones', 
+                    backgroundColor: 'grey', 
                     data: data.datasets[2]
+                },
+                { 
+                    label: 'Nuevas UCIs', 
+                    backgroundColor: 'red', 
+                    data: data.datasets[4]
                 }
             ]
             chart.update()
         }
-        
-        
-    })//, [data])
 
+        
+    })
 
     return (
-        <div className="VaccinationChart">
-
+        <div className="HospitalizationDeadsChart">
             <button onClick={ e => {setShowingAccumulated(!showingAccumulated)} }>Change</button>
 
             {showingAccumulated ? 

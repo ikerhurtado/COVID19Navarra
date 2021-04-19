@@ -1,15 +1,33 @@
 
+import XLSX from 'xlsx'
 
+const dataByTypeMap = new Map([
+  ['vaccination', './data/GobiernoAbiertoVacunas.csv'],
+  ['new-infections', './data/CasosMunicipios_ZR_Covid.csv'],
+  ['situation', './data/datos_coronavirus_julio_2020.xls']
+])
 export function getDataFile(type, callback){
 
-    const url =  (type === 'vaccination' ? './data/GobiernoAbiertoVacunas.csv' : './data/CasosMunicipios_ZR_Covid.csv')
-    fetch(url)
-    .then( response => response.text() )
-    .then( fileText => {
-        const data = (type === 'vaccination' ? parseVaccinationData(fileText) : parseNewInfectionsData(fileText))
-        callback(data)
-        console.log('data loaded', data)
-    })
+    if (type === 'situation'){
+      fetch(dataByTypeMap.get(type))
+      .then( response => response.arrayBuffer() )
+      .then( data => {
+        const workbook = XLSX.read(data, {type:"array"});
+        //console.log('data workbook', workbook.Sheets)
+        const pageData = XLSX.utils.sheet_to_csv(workbook.Sheets['Resumen'])
+        callback(parseSituationData(pageData))
+
+        console.log('Sit transfomm', 
+          transformSituationDataToShow(parseSituationData(pageData)))
+      })
+    }else
+      fetch(dataByTypeMap.get(type))
+      .then( response => response.text() )
+      .then( fileText => {
+          const data = (type === 'vaccination' ? parseVaccinationData(fileText) : parseNewInfectionsData(fileText))
+          callback(data)
+          console.log('data loaded', data)
+      })
 }
 
 export function transformVaccinationDataToShow(rawData){
@@ -176,4 +194,51 @@ function parseNewInfectionsData(text){
       return lineTokens[DATE_FIELD_INDEX].substring(0,7)
   }
 
+}
+
+
+function parseSituationData(text){
+
+  const DATA_ROWS_FROM_INDEX = 6 // First array element holding data field names
+  const DATE_FIELD_INDEX = 0 
+
+  let data = []
+  
+  text.split('\n').forEach( (line, index) => {
+    const lineTokens = line.trim().split(',')
+    if (index < DATA_ROWS_FROM_INDEX){
+      // console.log('HHHHHHHHHH', lineTokens)
+    }else if (lineTokens.length > 1){
+        const dataRow = []
+        lineTokens.forEach( (token, index) => {
+          if (index < 15)
+            if (index == DATE_FIELD_INDEX) 
+              dataRow.push(token) //*** Parse date */
+            else 
+              dataRow.push( token ? parseFloat(token) : null)
+        })
+      data.push(dataRow)
+    } 
+  })
+  data.reverse()
+  console.log('parseSituationData ', data)
+  return data
+}
+
+
+export function transformSituationDataToShow(rawData){
+  const chartData = { 
+      labels: [], 
+      datasets: [[], [], [], [], [], []]
+  }
+  rawData.forEach( dayData => {
+      chartData.labels.push(dayData[0])
+      chartData.datasets[0].push(dayData[4]) // deads
+      chartData.datasets[1].push(dayData[3]) // accumulated deads
+      chartData.datasets[2].push(dayData[11]) // new hospaializations
+      chartData.datasets[3].push(dayData[12]) // accumulted hospaializations
+      chartData.datasets[4].push(dayData[13]) // new in UCI
+      chartData.datasets[5].push(dayData[14]) // accumulated UCI
+  })
+  return chartData
 }

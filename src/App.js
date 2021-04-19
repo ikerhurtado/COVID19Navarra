@@ -1,10 +1,13 @@
 import React, {useState, useEffect} from 'react';
 import {Route} from 'wouter' 
 import './App.css'
-import {getDataFile, transformVaccinationDataToShow, transformNewInfectionsDataToShow} from './services/getDataFile.js'
+import {getDataFile, transformVaccinationDataToShow, 
+    transformNewInfectionsDataToShow,
+    transformSituationDataToShow} from './services/getDataFile.js'
 import HomePage from './pages/Home/HomePage.js'
 import VaccinationPage  from './pages/Vaccination/VaccinationPage.js'
 import InfectionsPage from './pages/Infections/InfectionsPage.js'
+import HospitalizationDeadsPage from './pages/HospitalizationDeads/HospitalizationDeadsPage.js'
 import Menu from './components/Menu/Menu';
 
 export default function App(){
@@ -13,13 +16,16 @@ export default function App(){
         ['/', 'INICIO'],
         ['/vacunacion', 'VACUNACIÓN'],
         ['/nuevos-infectados', 'NUEVOS INFECTADOS'],
+        ['/hospitalizacion-muertes', 'HOSPITALIZACIONES Y MUERTES'],
     ])
 
     const [vaccinationData, setVaccinationData] = useState([])
     const [newInfectionsData, setNewInfectionsData] = useState({rawData: new Map(), dataByDate: []})
+    const [situationData, setSituationData] = useState([])
     useEffect( () => {
         getDataFile('vaccination', data => { setVaccinationData(data) } )
-        getDataFile('newInfections', data => { setNewInfectionsData(data) } )
+        getDataFile('new-infections', data => { setNewInfectionsData(data) } )
+        getDataFile('situation', data => { setSituationData(data) } )
         console.log('App useEffect')
     }, [])
     
@@ -31,7 +37,9 @@ export default function App(){
             
             <Route path="/">
                 {params => <HomePage vaccinationData={vaccinationData} 
-                    newInfectionsData={transformNewInfectionsDataToShow(newInfectionsData.dataByDate)} />}
+                    newInfectionsData={transformNewInfectionsDataToShow(newInfectionsData.dataByDate)}
+                    hospitalizationDeadsData={transformSituationDataToShow(situationData)}
+                    />}
             </Route> 
 
             <Route path="/vacunacion" >
@@ -40,6 +48,10 @@ export default function App(){
 
             <Route path="/nuevos-infectados" >
                 {params => <InfectionsPage data={newInfectionsData}  />}
+            </Route>
+
+            <Route path="/hospitalizacion-muertes" >
+                {params => <HospitalizationDeadsPage data={situationData}  />}
             </Route>
 
         </div>
